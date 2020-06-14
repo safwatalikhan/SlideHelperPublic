@@ -1,0 +1,501 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      .logo { vertical-align: middle; }
+      ul { list-style-type: none; padding: 0; }
+      h4 { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <form class="sidebar branding-below">
+      <!--<h4>Translate selected slides into:</h4>-->
+      <!--<ul id="languages"></ul>-->
+      <div class="block" id="button-bar">
+        <!--<button class="blue" id="run-translation">Translate</button>
+        
+        <br><br>-->
+        <button class="blue" id="bold">Bold</button>
+        <br><br>
+        <button class="blue" id="italic">Italic</button>
+        <br><br>
+        <button class="blue" id="underline">Underline</button>
+        <br><br>
+        <button class="blue" id="getText">Get text properties</button>
+        <br><br>
+        <button class="blue" id="setText">Change Element Text Style</button>
+        <br><br>
+        <button class="blue" id="resizePosition">Resize and Position Elements</button>
+        <br><br>
+        <button class="blue" id="alignText">Align Elements Text</button>
+        <br><br>
+        <button class="blue" id="setPosDimMaster">Resize and Position as Master</button>
+        <br><br>
+        <button class="blue" id="setAlignMaster">Set Alignment as Master</button>
+        <br><br>
+        <button class="blue" id="predictBoldOrNot">Predict Bold or Not</button>
+        <br>
+        <label class = "green" id ="boldOrNot"></label>
+        <br><br>
+        <button class="blue" id="predictItalicOrNot">Predict Italic or Not</button>
+        <br>
+        <label class = "green" id ="italicOrNot"></label>
+        <br><br>
+        <button class="blue" id="predictUnderlinedOrNot">Predict Underlined or Not</button>
+        <br>
+        <label class = "green" id ="underlinedOrNot"></label>
+        <br><br>
+        <button class="blue" id="predictFont">Predict Font size</button>
+        <br>
+        <label class = "green" id ="fontSizePrediction"></label>
+        <br>
+        <button class="blue" id="fixPosition">Fix Position</button>
+        <br>
+        <label class = "green" id ="position"></label>
+      </div>
+      <h5 class="error" id="error"></h5>
+    </form>
+    <div class="sidebar bottom">
+      <img alt="Add-on logo" class="logo"
+        src="https://www.gstatic.com/images/branding/product/1x/translate_48dp.png" width="27" height="27">
+      <span class="gray branding-text">Translate sample by Google</span>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      $(function() {
+        // Add an input radio button for every language.
+        var languages = {
+          ar: 'Arabic',
+          zh: 'Chinese',
+          en: 'English',
+          fr: 'French',
+          de: 'German',
+          hi: 'Hindi',
+          ja: 'Japanese',
+          pt: 'Portuguese',
+          es: 'Spanish'
+        };
+        var languageList = Object.keys(languages).map(function(id) {
+          return $('<li>').html([
+            $('<input>')
+                .attr('type', 'radio')
+                .attr('name', 'dest')
+                .attr('id', 'radio-dest-' + id)
+                .attr('value', id),
+            $('<label>')
+                .attr('for', 'radio-dest-' + id)
+                .html(languages[id])
+          ]);
+        });
+        // var data = [];
+        // $(function() {
+          
+        // google.script.run
+        //     .withSuccessHandler(function(dataCollected) {
+              
+        //       data=dataCollected;
+        //       return false;
+        //      })
+        //     .withFailureHandler(function(msg, element) {
+        //       element.disabled = false;
+        //       $('#error').text('Something went wrong. Please check the add-on logs.');
+        //       return false;
+        //     })
+        //     .withUserObject(this)
+        //     .buildData();
+        // });
+        $('#run-translation').click(runTranslation);
+        $('#languages').html(languageList);
+        $('#italic').click(textItalicize);
+        $('#bold').click(textBold);
+        $('#underline').click(textUnderline);
+        $('#getText').click(getTextProperties);
+        $('#setText').click(setTextProperties);
+        $('#resizePosition').click(resizePosition);
+        $('#alignText').click(alignText);
+        $('#setPosDimMaster').click(setPosDimMaster);
+        $('#setAlignMaster').click(setAlignmentsAsMaster);
+        $('#predictBoldOrNot').click(predictBoldOrNot);
+        $('#predictItalicOrNot').click(predictItalicOrNot);
+        $('#predictUnderlinedOrNot').click(predictUnderlinedOrNot);
+        $('#predictFont').click(predictFont);
+        $('#fixPosition').click(fixPosition);
+        
+      });
+
+      /**
+       * Runs a server-side function to translate the text on all slides.
+       */
+      function runTranslation() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .translateSelectedElements($('input[name=dest]:checked').val());
+      }
+      function textItalicize() {
+      this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .italicizeSelectedElements(true);
+      }
+      function textBold() {
+      this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .boldSelectedElements(true);
+      }
+      
+      function textUnderline() {
+      this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .underlineSelectedElements(true);
+      }
+
+      function textAlign() {
+      this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .setAlignment();
+      }
+
+      function setTextProperties(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .setTextProp();
+         
+
+
+      }
+      function resizePosition(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .resizeAndPosition();
+         
+
+
+      }
+      function getTextProperties() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .getTextProp();
+      }
+      function alignText(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .alignParagraphText();
+         
+
+
+      }
+
+
+      function setPosDimMaster(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .setPositionsDimensionsAsMaster();
+         
+
+
+      }
+
+      function setAlignmentsAsMaster(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(numTranslatedElements, element) {
+              element.disabled = false;
+              if (numTranslatedElements === 0) {
+                $('#error').empty()
+                    .append('Did you select elements to translate?')
+                    .append('<br/>')
+                    .append('Please select slides or individual elements.');
+              }
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .setAlignmentsAsMaster();
+         
+
+
+      }
+      
+      function predictBoldOrNot(){
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(bold, element) {
+              element.disabled = false;
+              if (bold === 'true') {
+                $('#boldOrNot').text('Should be bold.');
+              }
+              else $('#boldOrNot').text('Should not be bold.');
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .predictBold();
+         
+
+
+      }
+      function predictItalicOrNot() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(italic, element) {
+              element.disabled = false;
+              if (italic === 'true') {
+                $('#italicOrNot').text('Should be italic.');
+              }
+              else $('#italicOrNot').text('Should not be italic.');
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .predictItalic();
+      }
+      function predictUnderlinedOrNot() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(underline, element) {
+              element.disabled = false;
+              if (underline==='true') {
+                $('#underlinedOrNot').text('Should be underlined.');
+              }
+              else $('#underlinedOrNot').text('Should not be underlined.');
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .predictUnderline();
+      }
+      function predictFont() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(fontsize, element) {
+              element.disabled = false;
+              $('#fontSizePrediction').text('Predicted font size: '+fontsize);
+              return false;
+             })
+            .withFailureHandler(function(msg, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .predictFontSize();
+            
+            
+      }
+      function fixPosition() {
+        this.disabled = true;
+        $('#error').text('');
+        google.script.run
+            .withSuccessHandler(function(position, element) {
+              element.disabled = false;
+              // if(!position) $('#position').text('Positioned perfectly!');
+              // else if(position) $('#position').text('Element is moved.');
+              $('#position').text(position);
+              
+              return false;
+             })
+            .withFailureHandler(function(position, element) {
+              element.disabled = false;
+              $('#error').text('Something went wrong. Please check the add-on logs.');
+              return false;
+            })
+            .withUserObject(this)
+            .fixPosition();
+           
+            
+      }
+    </script>
+    
+  </body>
+</html>
